@@ -34,11 +34,11 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="140dp"
+        android:layout_marginTop="21dp"
         android:text="获取信息"
-        android:layout_below="@+id/main_toolbar"
-        android:layout_centerHorizontal="true"
-        android:onClick="sendRequest"/>
+        android:onClick="sendRequest"
+        android:layout_below="@+id/textInputLayout2"
+        android:layout_centerHorizontal="true" />
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -70,6 +70,16 @@
         android:layout_marginTop="56dp"
         android:layout_below="@+id/button"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/getHumiture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button"
+        android:layout_alignStart="@+id/button"
+        android:layout_below="@+id/button"
+        android:text="获取温湿度"
+        android:onClick="getHumiture"/>
 
 </RelativeLayout>
 </ScrollView>

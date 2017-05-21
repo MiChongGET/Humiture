@@ -18,14 +18,19 @@ import com.chinamobile.iot.onenet.OneNetApi;
 import com.chinamobile.iot.onenet.OneNetApiCallback;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import okhttp3.HttpUrl;
 
 public class MainActivity extends AppCompatActivity {
 
     private Handler mHandler = new Handler();
-    private String TAG = "数据获取：";
+    private String TAG = "数据获取";
     private EditText input_url;
     private TextView showjson;
 
@@ -73,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //获取参数信息
     public void sendRequest(View view){
         String url = input_url.getText().toString().trim();
 
@@ -85,6 +91,93 @@ public class MainActivity extends AppCompatActivity {
         //OneNetApi.get(url, mCallback);
 
     }
+
+
+    //获取温湿度信息
+
+    //获取所有数据的接口
+    interface Function1<T> {
+        void apply(T t);
+    }
+
+    //获取制定数据接口
+    interface Function2<T>{
+        void apply(T t1,T t2);
+    }
+    private void displayLog(String response) throws JSONException {
+        if ((response.startsWith("{") && response.endsWith("}")) || (response.startsWith("[") && response.endsWith("]"))) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jsonParser = new JsonParser();
+            response = gson.toJson(jsonParser.parse(response));
+            Log.i(TAG, response);
+            showjson.setText(response);
+
+            //将取得数据进行解析
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray dataArray = jsonObject.getJSONArray("data");
+            JSONObject humidity = dataArray.getJSONObject(9);
+            JSONObject temp = dataArray.getJSONObject(4);
+
+
+            String h_value = humidity.getString("current_value");
+            String h_id = humidity.getString("id");
+            String h_time = humidity.getString("update_at");
+            String h_symbol = humidity.getString("unit_symbol");
+
+            String t_value = temp.getString("current_value");
+            String t_id = temp.getString("id");
+            String t_time = temp.getString("update_at");
+            String t_symbol = temp.getString("unit_symbol");
+
+            Log.i(TAG, "湿度："+h_id+"------"+h_time+"------"+h_value+h_symbol);
+            Log.i(TAG, "温度："+t_id+"------"+t_time+"------"+t_value+t_symbol);
+
+//            showjson.setText(unit+value+time);
+
+        }
+        //DisplayApiRespActivity.actionDisplayApiResp(getActivity(), response);
+    }
+
+    private class Callback implements OneNetApiCallback {
+        @Override
+        public void onSuccess(String response) {
+            try {
+                displayLog(response);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(MainActivity.this, "数据获取成功", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onFailed(Exception e) {
+            Toast.makeText(MainActivity.this, "数据获取失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    //获取指定数据
+    private Function2<String> mQuerySingleDatastreamFunction = new Function2<String>() {
+        @Override
+        public void apply(String deviceId, String dataStreamId) {
+            OneNetApi.querySingleDataStream(deviceId, dataStreamId, new Callback());
+        }
+    };
+
+    //获取所有的数据
+    private Function1<String> mQueryMultiDataStreamFunction = new Function1<String>() {
+        @Override
+        public void apply(String deviceId) {
+            OneNetApi.queryMultiDataStreams(deviceId, new Callback());
+        }
+    };
+    public void getHumiture(View view){
+
+//        mQuerySingleDatastreamFunction.apply("6193404","temperature");
+        mQueryMultiDataStreamFunction.apply("6193404");
+
+    }
+
 
 
     //设置GET方式获取设备数据

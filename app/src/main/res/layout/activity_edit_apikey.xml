@@ -19,7 +19,8 @@
             android:id="@+id/edit_apikey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="请输入API_KEY" />
+            android:hint="请输入API_KEY"
+            android:text="ivgtJoCYq8k01bha2CvSprTaUDQ="/>
     </android.support.design.widget.TextInputLayout>
 
     <Button
